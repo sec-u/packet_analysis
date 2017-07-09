@@ -143,6 +143,7 @@ class MySQLAuth(object):
             # string end with 00
             user = ""
             db = ""
+
             pos_00 = 0
             for i in range(36, len_of_data_c2s):
                 if item[i] == "00":
@@ -152,6 +153,11 @@ class MySQLAuth(object):
 
             len_of_passwd = int(item[pos_00 + 1], base=16)
 
+            passwd = ""
+
+            if len_of_passwd > 0:
+                passwd = "".join(item[pos_00 + 2:pos_00 + 2 + len_of_passwd + 1])
+
             if is_connect_db == '1':
                 pos_of_db = pos_00 + 1 + len_of_passwd + 1
                 for i in range(pos_of_db, len_of_data_c2s):
@@ -159,7 +165,8 @@ class MySQLAuth(object):
                         break
                     db = db + chr(int(item[i], base=16))
 
-            crack_detail = "%s%s%s%s" % (sep, user, sep, db)
+            # user/database_name
+            crack_detail = "%s%s%s%s%s%s" % (sep, user, sep, passwd, sep, db)
             auth_detail.append(crack_detail)
 
         return auth_detail
@@ -186,11 +193,11 @@ class MySQLAuth(object):
 
             try:
                 len_of_packet = int(len_of_packet_str, base=16)
-
-                data_item = chrs[offset:offset + len_of_packet + 4]
+                next_offset = offset + len_of_packet + 4
+                data_item = chrs[offset:next_offset]
 
                 mysql_data_list.append(data_item)
-                offset = offset + len_of_packet + 4
+                offset = next_offset
             except Exception as e:
                 logging.error("[PACKET_LENGTH_COMPUTER_FAILED]: %r" % e)
                 return mysql_data_list

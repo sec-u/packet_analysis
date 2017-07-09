@@ -241,7 +241,8 @@ def inet_to_str(inet):
 
 class PCAPParse(object):
     def __init__(self, pcap):
-
+        self.f = None
+        self.pcap = None
         if isinstance(pcap, dpkt.pcap.Reader):
             pass
         elif os.path.exists(pcap):
@@ -266,7 +267,8 @@ class PCAPParse(object):
         :param asset_port: array
         :return:
         """
-
+        if self.pcap is None:
+            return
         for ts, buf in self.pcap:
 
             # timestamp

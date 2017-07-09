@@ -2,7 +2,7 @@
 
 * 读取pcap包，打印详细的icmp/tcp/udp协议
 
-* 读取pcap包或网络接口，打印详细的tcp会话数据
+* 读取pcap包或网络接口，打印详细的tcp会话数据，目前支持mysql/pgsql/smtp/ftp/ssh解析
 
 
 
@@ -56,6 +56,16 @@
 
    第二步:
    `python print_tcp_session.py`
+
+
+
+# Bugs
+## libnids
+1. 不支持ipv6格式的数据包
+2. 当server.yaml中配置为重组双向流量时
+`data_stream_direct: 2` ，
+只在tcp flag为RST或FIN时才会打印数据
+
    
 
 
