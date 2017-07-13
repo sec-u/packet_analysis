@@ -10,7 +10,7 @@ from lib.PasswdCrackOb import PassWdCrackOb
 
 class PGSQLAuth(object):
     """
-    parse mysql auth protocol
+    parse pgsql auth protocol
     """
     __PGSQL_COMMAND_CODE = {
         '52': 'Authentication Request',  # Notice
@@ -91,7 +91,7 @@ class PGSQLAuth(object):
             len_auth_detail = len(auth_detail)
 
             i = 0
-            # while i < len_auth_detail:
+
             for i in range(i, len_auth_detail, 2):
                 auth_result_dict[auth_detail[i]] = auth_detail[i + 1]
 
@@ -104,7 +104,7 @@ class PGSQLAuth(object):
                     password=auth_result_dict.get("password")
                 )
 
-                crack_result = -1
+
                 if PGSQLAuth.__AUTH_CODE[auth_result[0]] == "Successful":
                     crack_result = 1
                 else:
@@ -249,21 +249,3 @@ class PGSQLAuth(object):
                 return pqsql_data_list
 
         return pqsql_data_list
-
-
-if __name__ == "__main__":
-
-    import lib.logger as logger
-    import codecs
-
-    logger.generate_special_logger(level=logging.INFO,
-                                   logtype="pgsql_parse",
-                                   curdir=mills.path("./log"))
-
-    pcap_file = mills.path("data/tcpsessiondata/pgsql.txt")
-    with codecs.open(pcap_file, mode='rb', encoding='utf-8') as fr:
-        for line in fr:
-
-            pqa = PGSQLAuth(eval(line))
-            for item in pqa.parse_data():
-                print item

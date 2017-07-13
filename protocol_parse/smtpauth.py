@@ -38,6 +38,8 @@ class SMTPAuth(object):
         """
         (is_both, auth_detail) = self.__parse_client_data()
         auth_result = self.__parse_server_data()
+        auth_detail.reverse()
+        auth_result.reverse()
 
         if auth_detail and auth_result:
 

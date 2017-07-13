@@ -1,13 +1,13 @@
 
 tcp_stream_handler:
  device_enable: 0 #是否从网卡读取数据包
- device: en0
+ device: lo0
 
  pcap_file_enable: 1 #是否从pcap读取数据包
  pcap_file: data/pcap_pub/http_gzip.pcap
 
  bpf_filter: tcp #包过滤条件，目前只支持tcp bpf
- dst_port_filter: [21,80]#[25] #按目标端口进行过滤
+ dst_port_filter: [21,22,25,5432,3306,6379,27017] #按目标端口进行过滤
  dst_ip_filter: [] #按目标IP进行过滤
 
  data_level: 2  #输出数据信息的详细程度，当大于1时，输出对应十六进制数据
@@ -16,7 +16,7 @@ tcp_stream_handler:
  std_output_enable: 1 #捕获数据包是否标准输出
 
  file_output_enable: 1 #捕获数据包是否文件输出
- file_tcpsession_path: data/tcpsessiondata/http.txt
+ file_tcpsession_path: data/tcpsessiondata/http_gzip.txt
 
 
  protocol_parse_conf: #根据端口号启用协议解析模块
@@ -24,4 +24,17 @@ tcp_stream_handler:
   ftp: [21]
   smtp: [25]
   mysql: [3306]
+  pgsql: [5432]
+  redis: [6379]
+  mongodb: [27017]
+  tfp: [69] #UDP
+  mssql: [1433]
+  oracle: [1521]
+  rdp: [3389]
+  oracle: [1521]
+  memcache: [11211]
+  vnc: [5900]
+  telnet: [23]
+  cassandra: [9042]
+
 

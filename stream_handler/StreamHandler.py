@@ -7,8 +7,11 @@ import os
 import lib.mills as mills
 from protocol_parse.ftpauth import FTPAuth
 from protocol_parse.mysqlauth import MySQLAuth
+from protocol_parse.pgsqlauth import PGSQLAuth
+from protocol_parse.redisauth import RESPAuth
 from protocol_parse.smtpauth import SMTPAuth
 from protocol_parse.sshauth import SSHAuth
+from protocol_parse.mongoauth import MongoDBAuth
 
 
 class StreamHandler(object):
@@ -94,6 +97,7 @@ class StreamHandler(object):
 
         :return:
         """
+
         nids.init()
 
         nids.register_tcp(self.__handleTCPStream)
@@ -101,7 +105,9 @@ class StreamHandler(object):
         # Loop forever (network device), or until EOF (pcap file)
         # Note that an exception in the callback will break the loop!
         try:
+
             nids.run()
+
         except nids.error as e:
             logging.error("[NIDS_RUN_Error]: %r" % e)
         except (KeyboardInterrupt, SystemExit) as e:
@@ -115,7 +121,9 @@ class StreamHandler(object):
         :param tcp:
         :return:
         """
+
         global ts_start, ts_end
+
         ((src_ip, src_port), (dst_ip, dst_port)) = tcp.addr
         if self.dst_port_filter and dst_port not in self.dst_port_filter:
             return
@@ -162,6 +170,7 @@ class StreamHandler(object):
         :param level:
         :return:
         """
+
         if self.std_output_enable:
             self.__human_print(tcp_stream_data, direct=direct, level=level)
         if self.file_hd_tcpsession:
@@ -177,6 +186,12 @@ class StreamHandler(object):
                 self.__parse_mysql_data(tcp_stream_data)
             elif protocol == "ssh":
                 self.__parse_ssh_data(tcp_stream_data)
+            elif protocol == "pgsql":
+                self.__parse_pgsql_data(tcp_stream_data)
+            elif protocol == "redis":
+                self.__parse_redis_data(tcp_stream_data)
+            elif protocol == "mongodb":
+                self.__parse_mongodb_data(tcp_stream_data)
 
     def __parse_smtp_data(self, tcp_stream_data):
         """
@@ -213,12 +228,56 @@ class StreamHandler(object):
 
     def __parse_ssh_data(self, tcp_stream_data):
         """
-
+        parse_ssh
         :param tcp_stream_data:
         :return:
         """
         ssha = SSHAuth(tcp_stream_data)
         data_yield = ssha.parse_data(sep="\x00")
+        for d in data_yield:
+            self.file_hd_tcpsession_parse.write("%r%s" % (d, os.linesep))
+
+    def __parse_pgsql_data(self, tcp_stream_data):
+        """
+        parse_pgsql
+        Args:
+            tcp_stream_data:
+
+        Returns:
+
+        """
+        pgsqla = PGSQLAuth(tcp_stream_data)
+        data_yield = pgsqla.parse_data(sep="\x00")
+
+        for d in data_yield:
+            self.file_hd_tcpsession_parse.write("%r%s" % (d, os.linesep))
+
+    def __parse_redis_data(self, tcp_stream_data):
+        """
+        parse redis
+        Args:
+            tcp_stream_dta:
+
+        Returns:
+
+        """
+        redisa = RESPAuth(tcp_stream_data)
+        data_yield = redisa.parse_data()
+        for d in data_yield:
+            self.file_hd_tcpsession_parse.write("%r%s" % (d, os.linesep))
+
+    def __parse_mongodb_data(self, tcp_stream_data):
+        """
+        parse mongo
+        Args:
+            tcp_stream_data:
+
+        Returns:
+
+        """
+        mongoa = MongoDBAuth(tcp_stream_data)
+        data_yield = mongoa.parse_data(sep="\x00")
+
         for d in data_yield:
             self.file_hd_tcpsession_parse.write("%r%s" % (d, os.linesep))
 

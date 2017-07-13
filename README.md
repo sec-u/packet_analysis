@@ -2,7 +2,7 @@
 
 * 读取pcap包，打印详细的icmp/tcp/udp协议
 
-* 读取pcap包或网络接口，打印详细的tcp会话数据，目前支持mysql/pgsql/smtp/ftp/ssh解析
+* 读取pcap包或网络接口，打印详细的tcp会话数据，目前支持mysql/pgsql/smtp/ftp/ssh/redis/mongodb解析
 
 
 

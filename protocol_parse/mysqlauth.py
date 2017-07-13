@@ -38,6 +38,8 @@ class MySQLAuth(object):
 
         auth_detail = self.__parse_client_data(sep=sep)
         auth_result = self.__parse_server_data()
+        auth_detail.reverse()
+        auth_result.reverse()
 
         if auth_detail and auth_result:
 
@@ -184,7 +186,7 @@ class MySQLAuth(object):
         offset = 0
 
         while offset < len_of_chrs:
-            # 前三个字节表示长度，第四个字节表示序列号
+            # 前三个字节表示长度，第四个字节表示序列号, 小端字节序
 
             first_3_offset = chrs[offset:offset + 3]
             len_of_packet_str = "".join(reversed(first_3_offset))
