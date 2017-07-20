@@ -76,7 +76,7 @@ class FTPAuth(object):
         # 4/5:failed 530 Login incorrect.
         # 3:un-finished
         auth_result = []
-        parts = self.data_s2c.split("\r\n")
+        parts = self.__split_ftp_data(self.data_s2c)
         server_data_pattern = re.compile(r'^(\d{3})\s(.+)$')
         for p in parts:
             m = re.match(server_data_pattern, p)
@@ -97,10 +97,9 @@ class FTPAuth(object):
         :return:
         """
         # command+\s+[param]+\r\n
-        # AUTH PLAIN AHRlcReQAdGVzdA== base64decode(emailpass)
         #
         auth_detail = []
-        parts = self.data_c2s.split("\r\n")
+        parts = self.__split_ftp_data(self.data_c2s)
 
         client_data_parttern = re.compile(r'^(USER|PASS)\s(.+)$')
 
@@ -112,3 +111,18 @@ class FTPAuth(object):
                 auth_detail.append(param)
 
         return auth_detail
+
+    def __split_ftp_data(self, data):
+        """
+        splite packets-str to packet list
+        :param data:
+        :return:
+        """
+        ftp_data_list = []
+        try:
+            ftp_data_list = data.split("\r\n")
+        except Exception as e:
+            logging.error("[SPLIT_FTP_DATA_FAILED]: %s %r" % (data, e))
+
+        return ftp_data_list
+

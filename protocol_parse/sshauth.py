@@ -4,11 +4,11 @@ import logging
 import re
 
 from lib.PasswdCrackOb import PassWdCrackOb
-
+import lib.mills as mills
 
 class SSHAuth(object):
     """
-    parse ftp auth protocol
+    parse ssh auth protocol
     """
 
     def __init__(self,
@@ -104,3 +104,5 @@ class SSHAuth(object):
                 auth_detail.append(p)
 
         return auth_detail
+
+

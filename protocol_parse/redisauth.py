@@ -50,7 +50,6 @@ class RESPAuth(object):
 
             if len(auth_result) <= len(auth_detail):
                 while auth_detail and auth_result:
-
                     crack_detail = auth_detail.pop()
                     crack_result = auth_result.pop()
 
@@ -140,10 +139,10 @@ class RESPAuth(object):
         :param data:
         :return:
         """
-        pqsql_data_list = []
+        redis_data_list = []
         try:
-            pqsql_data_list = data.split("\r\n")
+            redis_data_list = data.split("\r\n")
         except Exception as e:
             logging.error("[SPLIT_REDIS_DATA_FAILED]: %s %r" % (data, e))
 
-        return pqsql_data_list
+        return redis_data_list

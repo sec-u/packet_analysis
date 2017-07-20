@@ -278,6 +278,7 @@ class PCAPParse(object):
             if buf:
                 try:
                     eth = dpkt.ethernet.Ethernet(buf)
+
                 except dpkt.dpkt.NeedData as e:
                     logging.error("%s : %s" % (repr(buf), repr(e)))
                     continue
@@ -356,6 +357,7 @@ class PCAPParse(object):
                                 tcp_flags_list=flags_list,
                                 tcp_win=tcp_win,
                                 ttl=ttl)
+
                 yield result
             elif isinstance(data, dpkt.udp.UDP):
                 sport = data.sport
@@ -488,9 +490,9 @@ if __name__ == '__main__':
                                    ismultiprocess=False)
     from optparse import OptionParser
 
-    pcap_path = mills.path("data/pcap_pub/http_gzip.pcap")
+    pcap_path = mills.path("data/pcap_pub/wireshark/mysql_complete.pcap")
     assetip = None
-    assetport = "80"
+    assetport = None
 
     parser = OptionParser()
 
@@ -531,3 +533,5 @@ if __name__ == '__main__':
     else:
         asset_port = None
     ppo.output_pcap(asset_ip=asset_ip, asset_port=asset_port)
+
+

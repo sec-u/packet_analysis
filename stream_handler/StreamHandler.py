@@ -6,12 +6,13 @@ import os
 
 import lib.mills as mills
 from protocol_parse.ftpauth import FTPAuth
+from protocol_parse.mongoauth import MongoDBAuth
 from protocol_parse.mysqlauth import MySQLAuth
 from protocol_parse.pgsqlauth import PGSQLAuth
+from protocol_parse.rdpauth import RDPAuth
 from protocol_parse.redisauth import RESPAuth
 from protocol_parse.smtpauth import SMTPAuth
 from protocol_parse.sshauth import SSHAuth
-from protocol_parse.mongoauth import MongoDBAuth
 
 
 class StreamHandler(object):
@@ -192,6 +193,8 @@ class StreamHandler(object):
                 self.__parse_redis_data(tcp_stream_data)
             elif protocol == "mongodb":
                 self.__parse_mongodb_data(tcp_stream_data)
+            elif protocol == "rdp":
+                self.__parse_rdp_data(tcp_stream_data)
 
     def __parse_smtp_data(self, tcp_stream_data):
         """
@@ -278,6 +281,20 @@ class StreamHandler(object):
         mongoa = MongoDBAuth(tcp_stream_data)
         data_yield = mongoa.parse_data(sep="\x00")
 
+        for d in data_yield:
+            self.file_hd_tcpsession_parse.write("%r%s" % (d, os.linesep))
+
+    def __parse_rdp_data(self, tcp_stream_data):
+        """
+        parse rdp
+        Args:
+            tcp_stream_data:
+
+        Returns:
+
+        """
+        rdpa = RDPAuth(tcp_stream_data)
+        data_yield = rdpa.parse_data(sep="\x00")
         for d in data_yield:
             self.file_hd_tcpsession_parse.write("%r%s" % (d, os.linesep))
 

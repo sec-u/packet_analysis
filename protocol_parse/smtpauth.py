@@ -100,7 +100,8 @@ class SMTPAuth(object):
         # 4/5:failed
         # 3:un-finished
         auth_result = []
-        parts = self.data_s2c.split("\r\n")
+
+        parts = self.__split_smtp_data(self.data_s2c)
         server_data_pattern = re.compile(r'^(\d{3})\s(.+)$')
         for p in parts:
             m = re.match(server_data_pattern, p)
@@ -130,7 +131,7 @@ class SMTPAuth(object):
         # AUTH PLAIN AHRlc3QAdGVzdA== base64decode(emailpass)
         #
         auth_detail = []
-        parts = self.data_c2s.split("\r\n")
+        parts = self.__split_smtp_data(self.data_c2s)
 
         client_data_parttern = re.compile(r'^(AUTH)?\s?(.+)$')
 
@@ -155,3 +156,17 @@ class SMTPAuth(object):
                         auth_detail.append(param)
 
         return (is_both, auth_detail)
+
+    def __split_smtp_data(self, data):
+        """
+        splite packets-str to packet list
+        :param data:
+        :return:
+        """
+        ftp_data_list = []
+        try:
+            ftp_data_list = data.split("\r\n")
+        except Exception as e:
+            logging.error("[SPLIT_SMTP_DATA_FAILED]: %s %r" % (data, e))
+
+        return ftp_data_list

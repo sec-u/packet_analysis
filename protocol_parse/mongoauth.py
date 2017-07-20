@@ -83,8 +83,8 @@ class MongoDBAuth(object):
                                              ts_end=self.ts_end)
                         yield pcci.toDict()
         else:
-            # logging.error("[MongoDB_ODD_DATA]: %s" % repr(self.data_tuple))
-            pass
+            if auth_detail or auth_result:
+                logging.error("[MongoDB_ODD_DATA]: %s" % repr(self.data_tuple))
 
     def __parse_server_data(self):
         """
@@ -113,7 +113,7 @@ class MongoDBAuth(object):
             # document 变长
             documents = item[36:]
             document_result = self.__parse_document(documents)
-            # print "server", document_result
+            # print "server2clientData:",document_result
             if document_result.get("ok", 1) == 0 \
                     and document_result.get("code", 0) == 18 \
                     and document_result.get("codeName") == "AuthenticationFailed":
@@ -121,6 +121,7 @@ class MongoDBAuth(object):
             else:
                 if document_result.get("done", "00") == "01":
                     auth_result.append(1)
+        # print "auth_result:",auth_result
         return auth_result
 
     def __parse_client_data(self, sep="\x00"):
@@ -164,7 +165,7 @@ class MongoDBAuth(object):
             documents = item[i + 9:]
 
             document_result = self.__parse_document(documents)
-            # print "client", document_result
+            # print "client2serverData:",document_result
 
             if document_result.get("mechanism", None) == "SCRAM-SHA-1":
                 payload = document_result.get("payload")
@@ -187,6 +188,7 @@ class MongoDBAuth(object):
                 crack_detail = "%s%s%s%s%s%s" % (sep, user, sep, passwd, sep, fullcollectionname)
                 auth_detail.append(crack_detail)
 
+        # print "auth_detail:",auth_detail
         return auth_detail
 
     def __parse_document(self, documents):
@@ -324,24 +326,3 @@ class MongoDBAuth(object):
         return len_of_message
 
 
-if __name__ == "__main__":
-
-    import lib.logger as logger
-    import codecs
-
-    logger.generate_special_logger(level=logging.INFO,
-                                   logtype="mongo_parse",
-                                   curdir=mills.path("./log"))
-
-    pcap_file = mills.path("data/tcpsessiondata/mongodb.txt")
-    lines = []
-    with codecs.open(pcap_file, mode='rb', encoding='utf-8') as fr:
-        for line in fr:
-            lines.append(line)
-
-    for i in range(0, len(lines)):
-
-        pqa = MongoDBAuth(eval(lines[i]))
-
-        for item in pqa.parse_data():
-            print item
